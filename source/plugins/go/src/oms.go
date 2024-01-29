@@ -981,7 +981,10 @@ func PostTelegrafMetricsToLA(telegrafRecords []map[interface{}]interface{}) int 
 					return output.FLB_OK
 				}
 			}
+			Log("Tag is %d", MdsdInsightsMetricsTagName)
+			Log("All records: %v", msgPackEntries)
 			msgpBytes := convertMsgPackEntriesToMsgpBytes(MdsdInsightsMetricsTagName, msgPackEntries)
+			Log("msgpBytes: %v", msgpBytes)
 			var bts int
 			var er error
 			if IsWindows == false {
