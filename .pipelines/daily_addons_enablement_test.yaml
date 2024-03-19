@@ -1,3 +1,9 @@
+schedules:
+- cron: '0 0 * * *'
+  displayName: Daily midnight test
+  branches:
+    include:
+    - jajataki/enable_disable_addon
 jobs:
     - job: test
       variables:
