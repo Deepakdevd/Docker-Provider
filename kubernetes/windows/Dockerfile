@@ -23,7 +23,7 @@ RUN refreshenv \
 && echo gem: --no-document >> C:\ProgramData\gemrc \
 && gem install cool.io -v 1.7.1 --platform ruby \
 && gem install oj -v 3.3.10 \
-&& gem install fluentd -v 1.14.6 \
+&& gem install fluentd -v 1.16.3 \
 && gem install win32-service -v 1.0.1 \
 && gem install win32-ipc -v 0.7.0 \
 && gem install win32-event -v 0.6.3 \
@@ -62,16 +62,23 @@ COPY ./amalogswindows/installer/scripts/*.rb /opt/amalogswindows/scripts/ruby/
 # copy out_oms.so file
 COPY ./amalogswindows/out_oms.so /opt/amalogswindows/out_oms.so
 
+# copy containerinventory.so and perf.so file
+COPY ./amalogswindows/containerinventory.so /opt/fluent-bit/bin/containerinventory.so
+COPY ./amalogswindows/perf.so /opt/fluent-bit/bin/perf.so
+
 # copy fluent, fluent-bit and out_oms conf files
 COPY ./amalogswindows/installer/conf/fluent.conf /etc/fluent/
 COPY ./amalogswindows/installer/conf/fluent-bit.conf /etc/fluent-bit
 COPY ./amalogswindows/installer/conf/azm-containers-parser.conf /etc/fluent-bit/
 COPY ./amalogswindows/installer/conf/azm-containers-parser-multiline.conf /etc/fluent-bit/
+COPY ./amalogswindows/installer/conf/azm-containers-input-plugins.conf /etc/fluent-bit/
 COPY ./amalogswindows/installer/conf/out_oms.conf /etc/amalogswindows
 COPY ./amalogswindows/installer/conf/fluent-bit-geneva-logs_*.conf /etc/fluent-bit/
 COPY ./amalogswindows/installer/conf/fluent-bit-geneva.conf /etc/fluent-bit/
 COPY ./amalogswindows/installer/conf/fluent-bit-common.conf /etc/fluent-bit/
 COPY ./amalogswindows/installer/conf/fluent-bit-internal-metrics.conf /etc/fluent-bit/
+COPY ./amalogswindows/installer/conf/fluent-bit-input.conf /etc/fluent-bit/
+COPY ./amalogswindows/installer/conf/fluent-bit-telegraf-tcp.conf /etc/fluent-bit/
 
 
 # copy telegraf conf file
@@ -84,7 +91,7 @@ COPY ./amalogswindows/installer/scripts/rubyKeepCertificateAlive/*.rb /etc/fluen
 COPY ./amalogswindows/ruby/ /etc/fluent/plugin/
 
 # default value will be overwritten by pipeline
-ARG IMAGE_TAG=win-3.1.15
+ARG IMAGE_TAG=win-3.1.18
 ENV AGENT_VERSION ${IMAGE_TAG}
 
 ENV OS_TYPE "windows"

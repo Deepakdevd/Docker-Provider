@@ -1,6 +1,6 @@
 #!/usr/local/bin/ruby
 
-#this should be require relative in Linux and require in windows, since it is a gem install on windows
+
 @os_type = ENV["OS_TYPE"]
 require "tomlrb"
 
@@ -96,6 +96,8 @@ require_relative "ConfigParseErrorLogger"
 @ignoreProxySettings = false
 
 @multiline_enabled = "false"
+@resource_optimization_enabled = false
+@windows_fluent_bit_disabled = true
 
 @waittime_port_25226 = 45
 @waittime_port_25228 = 120
@@ -336,7 +338,7 @@ def populateSettingValuesFromConfigMap(parsedConfig)
           puts "Using config map value: AZMON_FBIT_MEM_BUF_LIMIT = #{@promFbitMemBufLimit.to_s + "m"}"
         end
       end
-      proxy_config = parseConfigMap[:agent_settings][:proxy_config]
+      proxy_config = parsedConfig[:agent_settings][:proxy_config]
       if !proxy_config.nil?
         ignoreProxySettings = proxy_config[:ignore_proxy_settings]
         if !ignoreProxySettings.nil? && ignoreProxySettings.downcase == "true"
@@ -349,6 +351,26 @@ def populateSettingValuesFromConfigMap(parsedConfig)
       if !multiline_config.nil?
         @multiline_enabled = multiline_config[:enabled]
         puts "Using config map value: AZMON_MULTILINE_ENABLED = #{@multiline_enabled}"
+      end
+
+      if !@controllerType.nil? && !@controllerType.empty? && @controllerType.strip.casecmp(@daemonset) == 0 && @containerType.nil?
+        resource_optimization_config = parsedConfig[:agent_settings][:resource_optimization]
+        if !resource_optimization_config.nil?
+          resource_optimization_enabled = resource_optimization_config[:enabled]
+          if !resource_optimization_enabled.nil? && (!!resource_optimization_enabled == resource_optimization_enabled) #Checking for Boolean type, since 'Boolean' is not defined as a type in ruby
+            @resource_optimization_enabled = resource_optimization_enabled
+          end
+          puts "Using config map value: AZMON_RESOURCE_OPTIMIZATION_ENABLED = #{@resource_optimization_enabled}"
+        end
+      end
+
+      windows_fluent_bit_config = parsedConfig[:agent_settings][:windows_fluent_bit]
+      if !windows_fluent_bit_config.nil?
+        windows_fluent_bit_disabled = windows_fluent_bit_config[:disabled]
+        if !windows_fluent_bit_disabled.nil? && windows_fluent_bit_disabled.downcase == "false"
+          @windows_fluent_bit_disabled = false
+        end
+        puts "Using config map value: AZMON_WINDOWS_FLUENT_BIT_DISABLED = #{@windows_fluent_bit_disabled}"
       end
 
       network_listener_waittime_config = parsedConfig[:agent_settings][:network_listener_waittime]
@@ -479,6 +501,12 @@ if !file.nil?
     file.write("export AZMON_MULTILINE_ENABLED=#{@multiline_enabled}\n")
   end
 
+  file.write("export AZMON_RESOURCE_OPTIMIZATION_ENABLED=#{@resource_optimization_enabled}\n")
+
+  if !@windows_fluent_bit_disabled
+    file.write("export AZMON_WINDOWS_FLUENT_BIT_DISABLED=#{@windows_fluent_bit_disabled}\n")
+  end
+
   file.write("export WAITTIME_PORT_25226=#{@waittime_port_25226}\n")
   file.write("export WAITTIME_PORT_25228=#{@waittime_port_25228}\n")
   file.write("export WAITTIME_PORT_25229=#{@waittime_port_25229}\n")
@@ -567,6 +595,19 @@ if !@os_type.nil? && !@os_type.empty? && @os_type.strip.casecmp("windows") == 0
       commands = get_command_windows("AZMON_MULTILINE_ENABLED", @multiline_enabled)
       file.write(commands)
     end
+    if @resource_optimization_enabled
+      commands = get_command_windows("AZMON_RESOURCE_OPTIMIZATION_ENABLED", @resource_optimization_enabled)
+      file.write(commands)
+    end
+
+    if !@windows_fluent_bit_disabled
+      commands = get_command_windows("AZMON_WINDOWS_FLUENT_BIT_DISABLED", @windows_fluent_bit_disabled)
+      file.write(commands)
+    end
+
+    commands = get_command_windows("WAITTIME_PORT_25229", @waittime_port_25229)
+    file.write(commands)
+
     # Close file after writing all environment variables
     file.close
     puts "****************End Config Processing********************"

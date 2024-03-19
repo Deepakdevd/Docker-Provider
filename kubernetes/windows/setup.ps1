@@ -20,6 +20,9 @@ Write-Host ('Creating folder structure')
     New-Item -Type Directory -Path /etc/config/settings/
     New-Item -Type Directory -Path /etc/config/adx/
 
+    New-Item -Type Directory -Path /opt/amalogswindows/state/
+    New-Item -Type Directory -Path /opt/amalogswindows/state/ContainerInventory/
+
 Write-Host ('Installing Fluent Bit');
 
     try {
@@ -38,6 +41,7 @@ Write-Host ('Finished Installing Fluentbit')
 
 Write-Host ('Installing Telegraf');
 try {
+    # For next telegraf update, make sure to update config changes in telegraf.conf, tomlparser-prom-customconfig.rb and tomlparser-osm-config.rb
     $telegrafUri='https://dl.influxdata.com/telegraf/releases/telegraf-1.24.2_windows_amd64.zip'
     Invoke-WebRequest -Uri $telegrafUri -OutFile /installation/telegraf.zip
     Expand-Archive -Path /installation/telegraf.zip -Destination /installation/telegraf

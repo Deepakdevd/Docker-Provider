@@ -8,6 +8,107 @@ information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeo
 additional questions or comments.
 
 ## Release History
+### 03/13/2024 -
+##### Version mcr.microsoft.com/azuremonitor/containerinsights/ciprod:3.1.18 (linux)
+##### Version mcr.microsoft.com/azuremonitor/containerinsights/ciprod:win-3.1.18 (windows)
+##### Current dependencies
+- Linux
+  - [CBL-Mariner 2.0.20240301](https://github.com/microsoft/azurelinux/releases/tag/2.0.20240301-2.0)
+  - Golang - 1.20.5
+  - Ruby - 3.1.3
+  - MDSD - 1.29.7
+  - Telegraf - 1.28.5
+  - Fluent-bit - 2.1.10
+  - Fluentd - 1.16.3
+- Windows
+  - Ruby - 3.1.1
+  - Fluent-bit - 2.0.14
+  - Telegraf - 1.24.2
+  - Fluentd - 1.16.3
+  - Windows AMA - 46.9.43
+  - Golang - 1.20.5
+##### Code change log
+## What's Changed
+- Common
+    * Build pipeline no disk space by @jatakiajanvi12 in https://github.com/microsoft/Docker-Provider/pull/1170
+    * update latest image version in yaml by @ganga1980 in https://github.com/microsoft/Docker-Provider/pull/1167
+    * Gangams/fix gh issue 3999 by @ganga1980 in https://github.com/microsoft/Docker-Provider/pull/1168
+    * Gangams/geneva msi mode bug fix by @ganga1980 in https://github.com/microsoft/Docker-Provider/pull/1173
+    * make multiline filter first in pipeline by @pfrcks in https://github.com/microsoft/Docker-Provider/pull/1151
+    * fix telegraf config related fixes by @ganga1980 in https://github.com/microsoft/Docker-Provider/pull/1176
+    * update multiline parser config logic by @pfrcks in https://github.com/microsoft/Docker-Provider/pull/1180
+    * Update .trivyignore by @ganga1980 in https://github.com/microsoft/Docker-Provider/pull/1187
+    * Gangams/expose disable telemetry config option by @ganga1980 in https://github.com/microsoft/Docker-Provider/pull/1189
+    * Updating the out_oms packages and Golang version to 1.21 by @jatakiajanvi12 in https://github.com/microsoft/Docker-Provider/pull/1182
+    * Integrating fluent-bit input plugins for Linux/Windows  by @jatakiajanvi12 in https://github.com/microsoft/Docker-Provider/pull/1144
+    * fix bugs in fluent-bit input plugins by @pfrcks in https://github.com/microsoft/Docker-Provider/pull/1200
+    * Update trivyignore by @jatakiajanvi12 in https://github.com/microsoft/Docker-Provider/pull/1203
+- Linux
+    * Gangams/telegraf update to 1.28.5 by @ganga1980 in https://github.com/microsoft/Docker-Provider/pull/1159
+    * Disable component based on logs profile (#1141) by @pfrcks in https://github.com/microsoft/Docker-Provider/pull/1145
+    * explicity set LOGS_AND_EVENTS_ONLY by @pfrcks in https://github.com/microsoft/Docker-Provider/pull/1177
+    * fix bugs for geneva and legacy mode for toggle components by @pfrcks in https://github.com/microsoft/Docker-Provider/pull/1174
+    * update v2 schema configmap by @pfrcks in https://github.com/microsoft/Docker-Provider/pull/1175
+    * add syslog option to linux daemonset for Arc by @pfrcks in https://github.com/microsoft/Docker-Provider/pull/1179
+    * update mdsd for aarch64 patch by @pfrcks in https://github.com/microsoft/Docker-Provider/pull/1183
+    * suppress errors and do a quiet grep by @pfrcks in https://github.com/microsoft/Docker-Provider/pull/1184
+    * Upgrade fluentd to 1.16.3 for linux by @wanlonghenry in https://github.com/microsoft/Docker-Provider/pull/1185
+    * fix script errors by @ganga1980 in https://github.com/microsoft/Docker-Provider/pull/1190
+    * fix configmap parse error by @ganga1980 in https://github.com/microsoft/Docker-Provider/pull/1191
+    * Gangams/extend arc k8s msi arm templates for ampls by @ganga1980 in https://github.com/microsoft/Docker-Provider/pull/1192
+    * Golang downgrade back to 1.20.5 by @jatakiajanvi12 in https://github.com/microsoft/Docker-Provider/pull/1198
+- Windows
+    * Longw/fluentd upgrade win by @wanlonghenry in https://github.com/microsoft/Docker-Provider/pull/1193
+    * Update the code to take toggle for env vars in windows by @jatakiajanvi12 in https://github.com/microsoft/Docker-Provider/pull/1196
+    * Update windows_fluent_bit default to disable by @jatakiajanvi12 in https://github.com/microsoft/Docker-Provider/pull/1201
+ 
+### 01/31/2024 -
+##### Version mcr.microsoft.com/azuremonitor/containerinsights/ciprod:3.1.17 (linux)
+##### Version mcr.microsoft.com/azuremonitor/containerinsights/ciprod:win-3.1.17 (windows)
+##### Release branch: https://github.com/microsoft/Docker-Provider/commits/release-ciprod-3.1.17/
+##### Current dependencies
+- Linux
+  - [CBL-Mariner 2.0.20240123](https://github.com/microsoft/CBL-Mariner/releases/tag/2.0.20240123-2.0)
+  - Golang - 1.20.5
+  - Ruby - 3.1.3
+  - MDSD - 1.29.4
+  - Telegraf - 1.27.3
+  - Fluent-bit - 2.0.9
+  - Fluentd - 1.14.6
+- Windows
+  - Ruby - 3.1.1
+  - Fluent-bit - 2.0.14
+  - Telegraf - 1.24.2
+  - Fluentd - 1.14.6
+  - Windows AMA - 46.9.43
+  - Golang - 1.20.5
+##### Code change log
+## What's Changed
+- Common
+    * Longw/esrp signing and dynamic scripts refactoring by @wanlonghenry in #1087
+    * Add user agent to KubeAPI and CAdvisor clients by @pfrcks in #1108
+    * Gangams/dotnet core version update by @ganga1980 in #1110
+    * Fix bug by @pfrcks in #1111
+    * Update pipeline build image from ubuntu 18 to 20 by @wanlonghenry in #1119
+    * Add telegraf enabled/disabled info in TelegrafMetricsSentCount by @jatakiajanvi12 in #1121
+    * Telemetry gap: Adding missing heartbeat telemetry by @jatakiajanvi12 in #1129
+    * Telemetry optimization - Add K8sAPI and CAdvisorAPI response code telemetry in customMetrics by @jatakiajanvi12 in #1122
+    * Telemetry gap: Add PerfMetricsCount and HPACount metrics by @jatakiajanvi12 in #1131
+    * Telemetry optimization: Sending mdsd error traces as metrics by @jatakiajanvi12 in #1147
+    * Make multiline languages configurable by @pfrcks in #1149
+    * Change multiline default config to disable all by @wanlonghenry in #1153
+    * Upgrade pipeline ubuntu image version by @wanlonghenry in #1156
+- Linux
+    * Fix telegraf rs false errors by @pfrcks in #1105
+    * Update the fluent-bit plugins and telegraf to version 1.27.3 by @jatakiajanvi12 in #1107
+    * Gangams/mdsd update for FIPS and FedRamp compliance by @ganga1980 in #1135
+- Windows
+    * Send kubemonagent event using windows ama by @jatakiajanvi12 in #1127
+    * Removing the exit condition if credentials not provided for proxy in Windows by @jatakiajanvi12 in #1136
+    * Removing the certificate creation for geneva non MSI by @jatakiajanvi12 in #1137
+    * Fix the geneva logs multi-tenancy regression in legacy mode by @ganga1980 in #1161
+- Azure Arc K8s Extension
+    * Gangams/fix arc k8s windows custom metrics bug by @ganga1980 in #1118
 
 ### 12/08/2023 -
 ##### Version mcr.microsoft.com/azuremonitor/containerinsights/ciprod:3.1.16 (linux)

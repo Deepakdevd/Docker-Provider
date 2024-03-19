@@ -42,6 +42,7 @@ func FLBPluginInit(ctx unsafe.Pointer) int {
 	if strings.Compare(strings.ToLower(enableTelemetry), "true") == 0 {
 		telemetryPushInterval := output.FLBPluginConfigKey(ctx, "TelemetryPushIntervalSeconds")
 		go SendContainerLogPluginMetrics(telemetryPushInterval)
+		go SendMdsdTracesAsMetrics(telemetryPushInterval)
 	} else {
 		Log("Telemetry is not enabled for the plugin %s \n", output.FLBPluginConfigKey(ctx, "Name"))
 		return output.FLB_OK
@@ -74,6 +75,8 @@ func FLBPluginFlush(data unsafe.Pointer, length C.int, tag *C.char) int {
 		return PushToAppInsightsTraces(records, appinsights.Information, incomingTag)
 	} else if strings.Contains(incomingTag, "oms.container.perf.telegraf") {
 		return PostTelegrafMetricsToLA(records)
+	} else if strings.Contains(incomingTag, "oneagent.containerinsights") {
+		return PostInputPluginRecords(records)
 	}
 
 	return PostDataHelper(records)

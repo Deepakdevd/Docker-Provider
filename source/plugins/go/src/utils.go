@@ -17,8 +17,8 @@ import (
 
 	"github.com/Azure/azure-kusto-go/kusto"
 	"github.com/Azure/azure-kusto-go/kusto/ingest"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/tinylib/msgp/msgp"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 )
 
 // ReadConfiguration reads a property file
@@ -183,6 +183,23 @@ func CreateMDSDClient(dataType DataType, containerType string) {
 			Log("Successfully created MDSD msgp socket connection for Insights metrics %s", mdsdfluentSocket)
 			MdsdInsightsMetricsMsgpUnixSocketClient = conn
 		}
+	case InputPluginRecords:
+		// incase of geneva logs integration mode, InsightsMetrics ingested via sidecar container socket
+		if IsGenevaLogsIntegrationEnabled {
+			mdsdfluentSocket = "/var/run/mdsd-PrometheusSidecar/default_fluent.socket"
+		}
+		if MdsdInputPluginRecordsMsgpUnixSocketClient != nil {
+			MdsdInputPluginRecordsMsgpUnixSocketClient.Close()
+			MdsdInputPluginRecordsMsgpUnixSocketClient = nil
+		}
+		conn, err := net.DialTimeout("unix",
+			mdsdfluentSocket, 10*time.Second)
+		if err != nil {
+			Log("Error::mdsd::Unable to open MDSD msgp socket connection for input plugin records %s", err.Error())
+		} else {
+			Log("Successfully created MDSD msgp socket connection for input plugin records %s", mdsdfluentSocket)
+			MdsdInputPluginRecordsMsgpUnixSocketClient = conn
+		}
 	}
 }
 
@@ -194,7 +211,6 @@ func CreateADXClient() {
 	}
 
 	authConfig := auth.NewClientCredentialsConfig(AdxClientID, AdxClientSecret, AdxTenantID)
-
 	client, err := kusto.New(AdxClusterUri, kusto.Authorization{Config: authConfig})
 	if err != nil {
 		Log("Error::mdsd::Unable to create ADX client %s", err.Error())

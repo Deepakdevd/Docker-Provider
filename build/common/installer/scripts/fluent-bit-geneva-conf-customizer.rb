@@ -4,15 +4,19 @@ require_relative "ConfigParseErrorLogger"
 LINUX_CONFIG_PATHS = {
   "common" => "/etc/opt/microsoft/docker-cimprov/fluent-bit-geneva.conf",
   "infra" => "/etc/opt/microsoft/docker-cimprov/fluent-bit-geneva-logs_infra.conf",
+  "infra_filter" => "/etc/opt/microsoft/docker-cimprov/fluent-bit-geneva-logs_infra_filter.conf",
   "tenant" => "/etc/opt/microsoft/docker-cimprov/fluent-bit-geneva-logs_tenant.conf",
+  "tenant_filter" => "/etc/opt/microsoft/docker-cimprov/fluent-bit-geneva-logs_tenant_filter.conf",
 }
 
 WINDOWS_CONFIG_PATHS = {
   "common" => "/etc/fluent-bit/fluent-bit-geneva.conf",
   "infra" => "/etc/fluent-bit/fluent-bit-geneva-logs_infra.conf",
+  "infra_filter" => "/etc/fluent-bit/fluent-bit-geneva-logs_infra_filter.conf",
   "tenant" => "/etc/fluent-bit/fluent-bit-geneva-logs_tenant.conf",
+  "tenant_filter" => "/etc/fluent-bit/fluent-bit-geneva-logs_tenant_filter.conf",
 }
-SUPPORTED_CONFIG_TYPES = ["common", "infra", "tenant"]
+SUPPORTED_CONFIG_TYPES = ["common", "infra", "tenant", "infra_filter", "tenant_filter"]
 
 @default_service_interval = "15"
 @default_mem_buf_limit = "10"
@@ -38,7 +42,10 @@ def substituteFluentBitPlaceHolders(configFilePath)
     memBufLimit = ENV["FBIT_TAIL_MEM_BUF_LIMIT"]
     ignoreOlder = ENV["FBIT_TAIL_IGNORE_OLDER"]
     multilineLogging = ENV["AZMON_MULTILINE_ENABLED"]
+    stacktraceLanguages = ENV["AZMON_MULTILINE_LANGUAGES"]
     enableFluentBitThreading = ENV["ENABLE_FBIT_THREADING"]
+    kubernetesMetadataCollection = ENV["AZMON_KUBERNETES_METADATA_ENABLED"]
+    annotationBasedLogFiltering = ENV["AZMON_ANNOTATION_BASED_LOG_FILTERING"]
 
     serviceInterval = is_valid_number?(interval) ? interval : @default_service_interval
     serviceIntervalSetting = "Flush         " + serviceInterval
@@ -81,8 +88,21 @@ def substituteFluentBitPlaceHolders(configFilePath)
       new_contents = new_contents.gsub("\n    ${TAIL_THREADED}\n", "\n")
     end
 
+    if !kubernetesMetadataCollection.nil? && kubernetesMetadataCollection.to_s.downcase == "true"
+      new_contents = new_contents.gsub("#${KubernetesFilterEnabled}", "")
+    end
+
+    if !annotationBasedLogFiltering.nil? && annotationBasedLogFiltering.to_s.downcase == "true"
+      # enabled kubernetes filter plugin if not already enabled
+      new_contents = new_contents.gsub("#${KubernetesFilterEnabled}", "")
+      new_contents = new_contents.gsub("#${AnnotationBasedLogFilteringEnabled}", "")
+    end
+
     if !multilineLogging.nil? && multilineLogging.to_s.downcase == "true"
-      new_contents = new_contents.gsub("#${MultilineEnabled}", "")
+      if !stacktraceLanguages.nil? && !stacktraceLanguages.empty?
+        new_contents = new_contents.gsub("#${MultilineEnabled}", "")
+        new_contents = new_contents.gsub("#${MultilineLanguages}", stacktraceLanguages)
+      end
       new_contents = new_contents.gsub("azm-containers-parser.conf", "azm-containers-parser-multiline.conf")
       # replace parser with multiline version. ensure running script multiple times does not have negative impact
       if (/[^\.]Parser\s{1,}docker/).match(text)
