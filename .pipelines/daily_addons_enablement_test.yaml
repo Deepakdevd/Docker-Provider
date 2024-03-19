@@ -8,11 +8,23 @@ jobs:
       steps:
           - task: AzureCLI@2
             inputs:
-                azureSubscription: ${{ variables.armServiceConnectionName }}
-                scriptType: 'bash'
-                scriptLocation: 'inlineScript'
-                inlineScript: |
-                  az --version
-                  az account show
-                  az account set -s ${{ variables.subscription }}
-                  az aks addon show --addon monitoring --name daily_enable_disable_test --resource-group ci-logs-prod-aks
+              azureSubscription: '${{ variables.armServiceConnectionName }}'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az --version
+                az account show
+                az account set -s ${{ variables.subscription }}
+                
+                # Define the resource group and AKS cluster name
+                resourceGroup="i-logs-prod-aks"
+                aksClusterName="daily_enable_disable_test"
+                
+                # Check if the omsagent addon is enabled
+                addonEnabled=$(az aks show --resource-group $resourceGroup --name $aksClusterName --query addonProfiles.omsagent.enabled -o tsv)
+                
+                if [ "$addonEnabled" == "true" ]; then
+                    echo "OMSAgent addon is enabled on the AKS cluster."
+                else
+                    echo "OMSAgent addon is not enabled on the AKS cluster."
+                fi
