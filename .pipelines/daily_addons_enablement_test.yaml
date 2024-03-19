@@ -34,9 +34,9 @@ jobs:
                     echo "OMSAgent addon has been re-enabled."
 
                     echo "Sleeping 10minutes for everything to get set up and logs start flowing"
-                    sleep 600
+                    sleep 400
                     # Check if there is data in the Log Analytics workspace
-                    dataCount=$(az monitor log-analytics query --workspace $workspaceId --query "ContainerInventory | where TimeGenerated > ago(5m) | count" -o tsv)
+                    dataCount=$(az monitor log-analytics query --workspace $workspaceId --analytics-query "ContainerInventory | where TimeGenerated > ago(5m) | count" -o tsv)
 
                     if [ $dataCount -gt 0 ]; then
                       echo "Data is present in the Log Analytics workspace."
