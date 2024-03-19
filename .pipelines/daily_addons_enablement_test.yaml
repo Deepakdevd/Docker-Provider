@@ -2,10 +2,15 @@ jobs:
     - job: test
       variables:
         armServiceConnectionName: 'ci-1es-acr-connection'
+        subscription: '9b96ebbd-c57a-42d1-bbe9-b69296e4c7fb'
       steps:
           - task: AzureCLI@2
             inputs:
                 azureSubscription: ${{ variables.armServiceConnectionName }}
                 scriptType: 'bash'
                 scriptLocation: 'inlineScript'
-                inlineScript: 'az aks list --resource-group ci-logs-prod-aks'
+                inlineScript: |
+                  az --version
+                  az account show
+                  az account set -s ${{ variables.subscription }}
+                  az aks list --resource-group ci-logs-prod-aks
