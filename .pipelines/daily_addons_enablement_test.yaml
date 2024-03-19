@@ -19,6 +19,7 @@ jobs:
                 # Define the resource group and AKS cluster name
                 resourceGroup="ci-logs-prod-aks"
                 aksClusterName="daily_enable_disable_test"
+                logAnalyticsWorkspace="/subscriptions/9b96ebbd-c57a-42d1-bbe9-b69296e4c7fb/resourcegroups/ci-logs-prod-aks/providers/microsoft.operationalinsights/workspaces/daily-enable-disable-test-la"
                 
                 # Check if the omsagent addon is enabled
                 addonEnabled=$(az aks show --resource-group $resourceGroup --name $aksClusterName --query addonProfiles.omsagent.enabled -o tsv)
@@ -28,7 +29,7 @@ jobs:
                     az aks disable-addons --addons monitoring --name $aksClusterName --resource-group $resourceGroup
                     sleep 10
                     echo "Re-enabling the OMSAgent addon..."
-                    az aks enable-addons --addons monitoring --name $aksClusterName --resource-group $resourceGroup
+                    az aks enable-addons --addons monitoring --name $aksClusterName --resource-group $resourceGroup --workspace-resource-id $logAnalyticsWorkspace
                     echo "OMSAgent addon has been re-enabled."
                 else
                     echo "OMSAgent addon is not enabled on the AKS cluster."
