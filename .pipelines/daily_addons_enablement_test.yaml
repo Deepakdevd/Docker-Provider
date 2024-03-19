@@ -15,4 +15,4 @@ jobs:
                   az --version
                   az account show
                   az account set -s ${{ variables.subscription }}
-                  az aks list --resource-group ci-logs-prod-aks
+                  az aks addon show --addon monitoring --name daily_enable_disable_test --resource-group ci-logs-prod-aks
