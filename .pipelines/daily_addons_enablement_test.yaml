@@ -17,7 +17,7 @@ jobs:
                 az account set -s ${{ variables.subscription }}
                 
                 # Define the resource group and AKS cluster name
-                resourceGroup="i-logs-prod-aks"
+                resourceGroup="ci-logs-prod-aks"
                 aksClusterName="daily_enable_disable_test"
                 
                 # Check if the omsagent addon is enabled
@@ -25,6 +25,11 @@ jobs:
                 
                 if [ "$addonEnabled" == "true" ]; then
                     echo "OMSAgent addon is enabled on the AKS cluster."
+                    az aks disable-addons --addons monitoring --name $aksClusterName --resource-group $resourceGroup
+                    sleep 10
+                    echo "Re-enabling the OMSAgent addon..."
+                    az aks enable-addons --addons monitoring --name $aksClusterName --resource-group $resourceGroup
+                    echo "OMSAgent addon has been re-enabled."
                 else
                     echo "OMSAgent addon is not enabled on the AKS cluster."
                 fi
