@@ -1,0 +1,9 @@
+jobs:
+    - job: test
+      steps:
+          - task: AzureCLI@2
+            inputs:
+                azureSubscription: 'ContainerInsights_Dev_Janvi(81895b44-c46d-44c3-9368-42f0386af28e)'
+                scriptType: 'bash'
+                scriptLocation: 'inlineScript'
+                inlineScript: 'az aks list --resource-group ci_ama_win_janvi'
