@@ -39,10 +39,10 @@ jobs:
                     az aks enable-addons --addons monitoring --name $aksClusterName --resource-group $resourceGroup --workspace-resource-id $logAnalyticsWorkspace
                     echo "OMSAgent addon has been re-enabled."
 
-                    echo "Sleeping 10minutes for everything to get set up and logs start flowing"
-                    sleep 400
+                    echo "Sleeping 6 minutes for everything to get set up and logs start flowing"
+                    sleep 360
                     # Check if there is data in the Log Analytics workspace
-                    dataCount=$(az monitor log-analytics query --workspace $workspaceId --analytics-query "ContainerInventory | where TimeGenerated > ago(5m) | count")
+                    dataCount=$(az monitor log-analytics query --workspace $workspaceId --analytics-query "ContainerInventory | where TimeGenerated > ago(5m) and _ResourceId contains "daily_enable_disable_test" | count")
                     countValue=$(echo "$dataCount" | jq -r '.[0].Count')
                     if [ $countValue -gt 0 ]; then
                       echo "Data is present in the Log Analytics workspace."
