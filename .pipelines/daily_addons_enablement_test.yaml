@@ -3,7 +3,7 @@ schedules:
   displayName: Daily midnight test
   branches:
     include:
-    - jajataki/enable_disable_addon
+    - ci_prod
 jobs:
     - job: test
       variables:
